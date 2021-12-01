@@ -4,30 +4,19 @@ import readInput
 
 fun main() {
     fun part1(input: List<String>): Int {
-        val scans = input.map(String::toInt)
-        var (prev) = scans
-        var increases = 0
-        scans.forEach { value ->
-            if (value > prev)
-                increases++
-            prev = value
-        }
-        return increases
+        return input
+            .map(String::toInt)
+            .windowed(size = 2, step = 1, partialWindows = false)
+            .count { (prev, current) -> current > prev }
     }
 
     fun part2(input: List<String>): Int {
-        val scans = input
+        return input
             .map(String::toInt)
             .windowed(size = 3, step = 1, partialWindows = false)
             .map { it.sum() }
-        var (prev) = scans
-        var increases = 0
-        scans.forEach { value ->
-            if (value > prev)
-                increases++
-            prev = value
-        }
-        return increases
+            .windowed(size = 2, step = 1, partialWindows = false)
+            .count { (prev, current) -> current > prev }
     }
 
     // test if implementation meets criteria from the description, like:
