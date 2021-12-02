@@ -3,13 +3,7 @@ package day02
 import readInput
 
 fun main() {
-    data class Position(val horizontal: Int, val depth: Int, val aim: Int = 0) {
-        operator fun plus(other: Position): Position = Position(
-            horizontal + other.horizontal,
-            depth + other.depth,
-            aim + other.aim
-        )
-    }
+    data class Position(val horizontal: Int, val depth: Int, val aim: Int = 0)
 
     fun part1(input: List<String>): Int {
         val position = input
@@ -25,7 +19,12 @@ fun main() {
                     else -> error("$cmd not supported")
                 }
             }
-            .reduce(Position::plus)
+            .reduce { acc, current ->
+                Position(
+                    horizontal = acc.horizontal + current.horizontal,
+                    depth = acc.depth + current.depth
+                )
+            }
 
         return position.horizontal * position.depth
     }
