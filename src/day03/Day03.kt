@@ -2,41 +2,38 @@ package day03
 
 import readInput
 
+
 fun main() {
 
     fun part1(input: List<String>): Int {
-        val count = mutableMapOf<Int, Int>()
-        for (line in input) {
-            for ((index, v) in line.withIndex()) {
-                count[index] = count.getOrDefault(index, 0) + v.toString().toInt()
-            }
-        }
-
+        val (example) = input
         val threshold = input.size / 2
+        val gammaCompare = { a: Int -> a > threshold }
+        val epsilonCompare = { a: Int -> a < threshold }
 
-        val gammaRate = (0 until input[0].length).joinToString(separator = "") { index ->
-            if (count[index]!! > threshold)
-                "1"
-            else
-                "0"
-        }
-        val epsilonRate = (0 until input[0].length).joinToString(separator = "") { index ->
-            if (count[index]!! < threshold)
-                "1"
-            else
-                "0"
-        }
+        val counts = example
+            .indices
+            .map { index -> input.count { it[index] == '1' } }
 
-        return gammaRate.toInt(2) * epsilonRate.toInt(2)
+        val gammaRate = counts
+            .joinToString(separator = "") {
+                if (gammaCompare(it)) "1" else "0"
+            }
+            .toInt(2)
+        
+        val epsilonRate = counts
+            .joinToString(separator = "") {
+                if (epsilonCompare(it)) "1" else "0"
+            }
+            .toInt(2)
+
+        return gammaRate * epsilonRate
     }
 
     fun part2(input: List<String>): Int {
         fun oxygenGeneratorRating(): Int {
             var selection = input
             for (index in input[0].indices) {
-                println(index)
-                println(selection)
-                println()
                 if (selection.size == 1)
                     break
                 val (a, b) = selection.partition { it[index] == '1' }
@@ -74,6 +71,8 @@ fun main() {
     check(part2(testInput) == 230) { "result = ${part2(testInput)}" }
 
     val input = readInput("day03/input")
+    check(part1(input) == 2967914) { "result = ${part1(input)}" }
+    check(part2(input) == 7041258) { "result = ${part2(input)}" }
     println(part1(input))
     println(part2(input))
 }
