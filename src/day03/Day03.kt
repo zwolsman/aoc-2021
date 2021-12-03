@@ -20,7 +20,7 @@ fun main() {
                 if (gammaCompare(it)) "1" else "0"
             }
             .toInt(2)
-        
+
         val epsilonRate = counts
             .joinToString(separator = "") {
                 if (epsilonCompare(it)) "1" else "0"
@@ -31,38 +31,43 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        fun oxygenGeneratorRating(): Int {
-            var selection = input
-            for (index in input[0].indices) {
-                if (selection.size == 1)
-                    break
-                val (a, b) = selection.partition { it[index] == '1' }
-                if (a.size > b.size)
-                    selection = a
-                if (b.size > a.size)
-                    selection = b
-                if (a.size == b.size)
-                    selection = a
-            }
-            return selection.first().toInt(2)
+        val (example) = input
+        val oxygenGeneratorRatingComparator = { high: List<String>, low: List<String> ->
+            if (high.size > low.size || high.size == low.size)
+                high
+            else
+                low
+        }
+        val co2ScrubberRatingComparator = { high: List<String>, low: List<String> ->
+            if (high.size > low.size || high.size == low.size)
+                low
+            else
+                high
         }
 
-        fun co2ScrubberRating(): Int {
-            var selection = input
-            for (index in 0 until 5) {
-                if (selection.size == 1)
-                    break
-                val (a, b) = selection.partition { it[index] == '1' }
-                if (a.size < b.size)
-                    selection = a
-                if (b.size < a.size)
-                    selection = b
-                if (a.size == b.size)
-                    selection = b
+        val oxygenGeneratorRating = example
+            .foldIndexed(input) { index, acc, _ ->
+                val (high, low) = acc.partition { it[index] == '1' }
+                if (acc.size == 1)
+                    acc
+                else
+                    oxygenGeneratorRatingComparator(high, low)
             }
-            return selection.first().toInt(2)
-        }
-        return oxygenGeneratorRating() * co2ScrubberRating()
+            .first()
+            .toInt(2)
+
+        val co2ScrubberRating = example
+            .foldIndexed(input) { index, acc, _ ->
+                val (high, low) = acc.partition { it[index] == '1' }
+                if (acc.size == 1)
+                    acc
+                else
+                    co2ScrubberRatingComparator(high, low)
+            }
+            .first()
+            .toInt(2)
+
+        return oxygenGeneratorRating * co2ScrubberRating
     }
 
     // test if implementation meets criteria from the description, like:
