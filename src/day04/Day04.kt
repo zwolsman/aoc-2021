@@ -4,26 +4,47 @@ import readInput
 
 typealias Cell = Pair<Int, Boolean>
 
-data class Board(private val state: MutableList<Cell>) {
+private const val BoardWidth = 5
+
+fun Board(rawBoard: String): Board {
+    val cells: List<Cell> = rawBoard
+        .split("\n")
+        .flatMap { row ->
+            row
+                .trim()
+                .split("\\s+".toRegex())
+                .map { cell -> cell.toInt() to false }
+        }
+    return Board(cells)
+}
+
+class Board(cells: List<Cell>) {
+    private val state = cells.toMutableList()
+
+    companion object {
+        private val columnIndices =
+            List(BoardWidth) { offset -> offset until BoardWidth * BoardWidth step BoardWidth }
+        private val rowIndices =
+            List(BoardWidth) { offset -> (offset * BoardWidth) until (offset * BoardWidth + BoardWidth) }
+
+        private fun onlyMarked(cells: List<Cell>): Boolean = cells.all { (_, marked) -> marked }
+    }
+
     val won: Boolean
-        get() = fullRows().isNotEmpty() || hasFullColumn()
+        get() = fullRows().isNotEmpty() || fullColumns().isNotEmpty()
 
     val unmarkedCells: List<Cell>
         get() = state.filter { (_, marked) -> !marked }
 
     private fun fullRows() =
-        state
-            .windowed(5, step = 5)
-            .filter { rows -> rows.all { (_, played) -> played } }
+        rowIndices
+            .map { row -> row.map { state[it] } }
+            .filter(Board::onlyMarked)
 
-    private fun hasFullColumn(): Boolean {
-        val columns = (0 until 5)
-            .map { offset -> offset until state.size step 5 }
-            .map { it.map { state[it] } }
-            .filter { columns -> columns.all { (_, played) -> played } }
-
-        return columns.isNotEmpty()
-    }
+    private fun fullColumns() =
+        columnIndices
+            .map { column -> column.map { state[it] } }
+            .filter(Board::onlyMarked)
 
     fun play(number: Int) {
         val index = state.indexOfFirst { (n, _) -> n == number }
@@ -33,28 +54,10 @@ data class Board(private val state: MutableList<Cell>) {
 }
 
 fun main() {
-
-    fun assembleBoards(input: List<String>): List<Board> {
-        return input
-            .filter { it.contains("\n") }
-            .map { board ->
-                board.split("\n")
-                    .map { row ->
-                        row.trim().split("\\s+".toRegex())
-                            .map { cell -> cell.toInt() }
-                    }
-                    .flatten()
-            }
-            .map { board ->
-                board.map { it to false }.toMutableList()
-            }
-            .map(::Board)
-    }
-
     fun part1(input: List<String>): Int {
         val (numbersString) = input
         val numbers = numbersString.split(",").map { it.toInt() }
-        val boards = assembleBoards(input)
+        val boards = input.drop(1).map(::Board)
 
         for (num in numbers) {
             for (board in boards) {
@@ -70,7 +73,7 @@ fun main() {
     fun part2(input: List<String>): Int {
         val (numbersString) = input
         val numbers = numbersString.split(",").map { it.toInt() }
-        val boards = assembleBoards(input)
+        val boards = input.drop(1).map(::Board)
 
         for (num in numbers) {
             for (board in boards) {
