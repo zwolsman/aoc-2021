@@ -2,55 +2,33 @@ package day04
 
 import readInput
 
-typealias Cell = Pair<Int, Boolean>
+typealias Board = List<Int>
 
 private const val BoardWidth = 5
+private val columnIndices =
+    List(BoardWidth) { offset -> offset until BoardWidth * BoardWidth step BoardWidth }
+private val rowIndices =
+    List(BoardWidth) { offset -> (offset * BoardWidth) until (offset * BoardWidth + BoardWidth) }
 
 fun Board(rawBoard: String): Board {
-    val cells: List<Cell> = rawBoard
+    return rawBoard
         .split("\n")
         .flatMap { row ->
             row
                 .trim()
                 .split("\\s+".toRegex())
-                .map { cell -> cell.toInt() to false }
+                .map { cell -> cell.toInt() }
         }
-    return Board(cells)
 }
 
-class Board(cells: List<Cell>) {
-    private val state = cells.toMutableList()
+fun Board.get(intProgression: IntProgression) = intProgression.map(::get)
+fun Board.bingo(numbers: Set<Int>): Boolean {
+    val columns = columnIndices.map(this::get)
+    val rows = rowIndices.map(this::get)
 
-    companion object {
-        private val columnIndices =
-            List(BoardWidth) { offset -> offset until BoardWidth * BoardWidth step BoardWidth }
-        private val rowIndices =
-            List(BoardWidth) { offset -> (offset * BoardWidth) until (offset * BoardWidth + BoardWidth) }
-
-        private fun onlyMarked(cells: List<Cell>): Boolean = cells.all { (_, marked) -> marked }
-    }
-
-    val won: Boolean
-        get() = fullRows().isNotEmpty() || fullColumns().isNotEmpty()
-
-    val unmarkedCells: List<Cell>
-        get() = state.filter { (_, marked) -> !marked }
-
-    private fun fullRows() =
-        rowIndices
-            .map { row -> row.map { state[it] } }
-            .filter(Board::onlyMarked)
-
-    private fun fullColumns() =
-        columnIndices
-            .map { column -> column.map { state[it] } }
-            .filter(Board::onlyMarked)
-
-    fun play(number: Int) {
-        val index = state.indexOfFirst { (n, _) -> n == number }
-        if (index != -1)
-            state[index] = number to true
-    }
+    return (columns + rows)
+        .map { it.toSet() }
+        .any { it.intersect(numbers).size == BoardWidth }
 }
 
 fun main() {
@@ -59,32 +37,31 @@ fun main() {
         val numbers = numbersString.split(",").map { it.toInt() }
         val boards = input.drop(1).map(::Board)
 
-        for (num in numbers) {
-            for (board in boards) {
-                board.play(num)
-                if (board.won)
-                    return board.unmarkedCells.sumOf { (n, _) -> n } * num
+        numbers.runningFold(emptySet<Int>()) { acc, n ->
+            when (val board = boards.firstOrNull { it.bingo(acc + n) }) {
+                null -> acc + n
+                else -> return (board - acc - n).sum() * n
             }
         }
 
-        return input.size
+        error("no bingo found")
     }
 
     fun part2(input: List<String>): Int {
         val (numbersString) = input
         val numbers = numbersString.split(",").map { it.toInt() }
-        val boards = input.drop(1).map(::Board)
+        val boards = input.drop(1).map(::Board).toMutableList()
 
-        for (num in numbers) {
-            for (board in boards) {
-                board.play(num)
-                if (boards.count { it.won } == boards.size) {
-                    return board.unmarkedCells.sumOf { (n, _) -> n } * num
-                }
-            }
+        numbers.runningFold(emptySet<Int>()) { acc, n ->
+            if (boards.size == 1 && boards.first().bingo(acc + n))
+                return (boards.first() - acc - n).sum() * n
+            else
+                boards.removeAll { it.bingo(acc + n) }
+
+            acc + n
         }
 
-        return input.size
+        error("no bingo found")
     }
 
     // test if implementation meets criteria from the description, like:
