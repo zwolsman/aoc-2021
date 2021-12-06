@@ -15,7 +15,7 @@ If you stuck with Kotlin-specific questions or anything related to this template
 
 |     | 2018 | 2019 | 2020 | 2021 |
 |:---:|:----:|:----:|:----:|:----:|
-|  1  |      |      |  ✅   |  ✅   |
+|  1  |      |  ✅   |  ✅   |  ✅   |
 |  2  |      |      |      |  ✅   |
 |  3  |      |      |      |  ✅   |
 |  4  |      |      |      |  ✅   |
