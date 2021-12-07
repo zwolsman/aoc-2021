@@ -21,7 +21,7 @@ If you stuck with Kotlin-specific questions or anything related to this template
 |  4  |      |      |      |  ✅   |
 |  5  |      |      |      |  ✅   |
 |  6  |      |      |      |  ✅   |
-|  7  |      |      |      |      |
+|  7  |      |      |      |  ✅   |
 |  8  |      |      |      |      |
 |  9  |      |      |      |      |
 | 10  |      |      |      |      |
