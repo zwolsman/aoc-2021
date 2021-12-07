@@ -1,34 +1,40 @@
 package year2021.day07
 
 import readInput
-import java.lang.Math.abs
+import kotlin.math.abs
+
+private typealias Crab = Int
 
 fun main() {
 
-    fun part1(input: List<String>): Int {
-        val crabs = input.map { it.toInt() }.sorted()
-        val fuelMap = mutableMapOf<Int, Int>()
+    fun rollup(n: Int, memoize: MutableMap<Int, Int>): Int {
+        if (n == 0)
+            return 0
+        return memoize.getOrPut(n) { n + rollup(n - 1, memoize) }
+    }
 
-        for (target in 0 until crabs.maxOf { it }) {
-            fuelMap[target] = crabs.fold(0) { acc, crab ->
-                acc + abs(crab - target)
+    fun bestHorizontal(crabs: List<Crab>, distanceFn: (Int, Int) -> Int): Int {
+        val positions = crabs.groupBy { it }.mapValues { (_, crabs) -> crabs.size }
+        val horizontalRange = 0 until positions.maxOf { it.key }
+        return horizontalRange.minOf { target ->
+            positions.entries.sumOf { (position, count) ->
+                distanceFn(position, target) * count
             }
         }
-        return fuelMap.minOf { (_, costs) -> costs }
+    }
+
+    fun part1(input: List<String>): Int {
+        val crabs = input.map { it.toInt() }
+        return bestHorizontal(crabs) { position, target -> abs(position - target) }
     }
 
     fun part2(input: List<String>): Int {
-        val crabs = input.map { it.toInt() }.sorted()
-        val fuelMap = mutableMapOf<Int, Int>()
-
-        for (target in 0 until crabs.maxOf { it }) {
-            fuelMap[target] = crabs.fold(0) { acc, crab ->
-                val distance = abs(crab - target)
-                val addition = (0..distance).reduceOrNull { j, i -> j + i } ?: 0
-                acc + addition
-            }
+        val crabs = input.map { it.toInt() }
+        val memoize = mutableMapOf<Int, Int>()
+        return bestHorizontal(crabs) { position, target ->
+            val distance = abs(position - target)
+            rollup(distance, memoize)
         }
-        return fuelMap.minOf { (_, costs) -> costs }
     }
 
     // test if implementation meets criteria from the description, like:
