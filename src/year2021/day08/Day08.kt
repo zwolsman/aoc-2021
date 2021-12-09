@@ -4,7 +4,26 @@ import readInput
 
 fun main() {
 
+    val segments = mapOf(
+        0 to "acfgeb",
+        1 to "cf",
+        2 to "acdeg",
+        3 to "acdfg",
+        4 to "bcdf",
+        5 to "abdfg",
+        6 to "abdfge",
+        7 to "acf",
+        8 to "acdfgeb",
+        9 to "acdfgb"
+    )
+
     fun part1(input: List<String>): Int {
+        val x = input.map { line ->
+            val (uniqueSignalPattern, outputValue) = line.split("|")
+            uniqueSignalPattern to outputValue
+        }
+
+
         return input.size
     }
 

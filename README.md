@@ -1,3 +1,4 @@
+
 # aoc-kotlin
 
 Welcome to the Advent of Code[^aoc] Kotlin project created by [zwolsman][github] using
@@ -23,7 +24,7 @@ If you stuck with Kotlin-specific questions or anything related to this template
 |  6  |      |      |      |  ✅   |
 |  7  |      |      |      |  ✅   |
 |  8  |      |      |      |      |
-|  9  |      |      |      |      |
+|  9  |      |      |      |  ✅   |
 | 10  |      |      |      |      |
 | 11  |      |      |      |      |
 | 12  |      |      |      |      |
