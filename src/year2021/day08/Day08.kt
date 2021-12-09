@@ -4,27 +4,30 @@ import readInput
 
 fun main() {
 
-    val segments = mapOf(
-        0 to "acfgeb",
-        1 to "cf",
-        2 to "acdeg",
-        3 to "acdfg",
-        4 to "bcdf",
-        5 to "abdfg",
-        6 to "abdfge",
-        7 to "acf",
-        8 to "acdfgeb",
-        9 to "acdfgb"
+    val displays = listOf(
+        0 to 6,
+        1 to 2,
+        2 to 5,
+        3 to 5,
+        4 to 4,
+        5 to 5,
+        6 to 6,
+        7 to 3,
+        8 to 7,
+        9 to 6,
     )
 
     fun part1(input: List<String>): Int {
-        val x = input.map { line ->
-            val (uniqueSignalPattern, outputValue) = line.split("|")
-            uniqueSignalPattern to outputValue
+        val uniqueSegments = displays
+            .groupBy { (_, segments) -> segments }
+            .filter { it.value.size == 1 }
+
+        return input.flatMap { line ->
+            val (_, outputValue) = line.split("|")
+            outputValue.split(" ")
+        }.count {
+            uniqueSegments.containsKey(it.length)
         }
-
-
-        return input.size
     }
 
     fun part2(input: List<String>): Int {
@@ -33,10 +36,10 @@ fun main() {
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("year2021/day08/test")
-    check(part1(testInput) == 1) { "result = ${part1(testInput)}" }
-    check(part2(testInput) == 1) { "result = ${part2(testInput)}" }
+    check(part1(testInput) == 26) { "result = ${part1(testInput)}" }
+//    check(part2(testInput) == 1) { "result = ${part2(testInput)}" }
 
     val input = readInput("year2021/day08/input")
     println(part1(input))
-    println(part2(input))
+//    println(part2(input))
 }
