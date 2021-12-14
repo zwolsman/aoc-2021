@@ -2,6 +2,9 @@ package year2021.day10
 
 import readInput
 
+class IllegalCharacterException(expected: Char?, found: Char, val points: Int) :
+    Exception("Expected $expected, but found $found instead")
+
 fun main() {
 
     val pairs = mapOf(
@@ -11,39 +14,41 @@ fun main() {
         '<' to '>',
     )
 
-    val points = mapOf(
-        ')' to 3,
-        ']' to 57,
-        '}' to 1197,
-        '>' to 25137
-    )
+    fun String.toNavigationSyntax(): String? {
+        val points = mapOf(
+            ')' to 3,
+            ']' to 57,
+            '}' to 1197,
+            '>' to 25137,
+        )
 
-    fun part1(input: List<String>): Int {
+        val result = runningFold("") { acc, c ->
+            if (c in pairs.keys)
+                return@runningFold acc + c
 
-        val missing = mutableMapOf<Char, Int>()
-        root@ for (line in input) {
-            val stack = mutableListOf<Char>()
+            val last = acc.lastOrNull()
+            val expected = pairs[last]
+            if (c == expected)
+                acc.dropLast(1)
+            else
+                throw IllegalCharacterException(expected, c, points[c]!!)
+        }
+        return result.lastOrNull()
+    }
 
-            for (c in line) {
-                if (c in pairs.keys)
-                    stack += c
-                if (c in pairs.values) {
-                    val last = stack.removeLastOrNull()
-                    val expected = pairs[last]
-                    if (expected != c) {
-                        missing[c] = missing.getOrDefault(c, 0) + 1
-                        continue@root
-                    }
-                }
-
+    fun part1(input: List<String>) =
+        input.sumOf {
+            val result = it.runCatching { it.toNavigationSyntax() }
+            when (val exception = result.exceptionOrNull()) {
+                is IllegalCharacterException -> exception.points
+                else -> 0
             }
         }
 
         return missing.map { (key, amount) -> points[key]!! * amount }.sum()
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+        return leftOvers.sorted().elementAt(leftOvers.size / 2)
     }
 
     // test if implementation meets criteria from the description, like:
