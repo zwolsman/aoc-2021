@@ -45,8 +45,30 @@ fun main() {
             }
         }
 
-        return missing.map { (key, amount) -> points[key]!! * amount }.sum()
-    }
+    fun part2(input: List<String>): Long {
+        val points = mapOf(
+            ')' to 1,
+            ']' to 2,
+            '}' to 3,
+            '>' to 4,
+        )
+        val leftOvers = input
+            .mapNotNull {
+                val result = it.runCatching { it.toNavigationSyntax() }
+                result.getOrNull()
+            }
+            .map { incomplete ->
+                incomplete
+                    .reversed()
+                    .map { points[pairs[it]] }
+            }
+            .map {
+                it
+                    .requireNoNulls()
+                    .fold(0L) { acc, i ->
+                        acc * 5 + i
+                    }
+            }
 
         return leftOvers.sorted().elementAt(leftOvers.size / 2)
     }
@@ -54,9 +76,9 @@ fun main() {
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("year2021/day10/test")
     check(part1(testInput) == 26397) { "result = ${part1(testInput)}" }
-//    check(part2(testInput) == 1) { "result = ${part2(testInput)}" }
+    check(part2(testInput) == 288957L) { "result = ${part2(testInput)}" }
 
     val input = readInput("year2021/day10/input")
     println(part1(input))
-//    println(part2(input))
+    println(part2(input))
 }
