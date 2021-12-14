@@ -2,7 +2,7 @@ package year2021.day10
 
 import readInput
 
-class IllegalCharacterException(expected: Char?, found: Char, val points: Int) :
+class IllegalCharacterException(expected: Char?, val found: Char) :
     Exception("Expected $expected, but found $found instead")
 
 fun main() {
@@ -15,13 +15,6 @@ fun main() {
     )
 
     fun String.toNavigationSyntax(): String? {
-        val points = mapOf(
-            ')' to 3,
-            ']' to 57,
-            '}' to 1197,
-            '>' to 25137,
-        )
-
         val result = runningFold("") { acc, c ->
             if (c in pairs.keys)
                 return@runningFold acc + c
@@ -31,19 +24,26 @@ fun main() {
             if (c == expected)
                 acc.dropLast(1)
             else
-                throw IllegalCharacterException(expected, c, points[c]!!)
+                throw IllegalCharacterException(expected, c)
         }
         return result.lastOrNull()
     }
 
-    fun part1(input: List<String>) =
-        input.sumOf {
+    fun part1(input: List<String>): Int {
+        val points = mapOf(
+            ')' to 3,
+            ']' to 57,
+            '}' to 1197,
+            '>' to 25137,
+        )
+        return input.sumOf {
             val result = it.runCatching { it.toNavigationSyntax() }
             when (val exception = result.exceptionOrNull()) {
-                is IllegalCharacterException -> exception.points
+                is IllegalCharacterException -> points[exception.found]
                 else -> 0
             }
         }
+    }
 
     fun part2(input: List<String>): Long {
         val points = mapOf(
@@ -52,7 +52,7 @@ fun main() {
             '}' to 3,
             '>' to 4,
         )
-        val leftOvers = input
+        val result = input
             .mapNotNull {
                 val result = it.runCatching { it.toNavigationSyntax() }
                 result.getOrNull()
@@ -70,7 +70,7 @@ fun main() {
                     }
             }
 
-        return leftOvers.sorted().elementAt(leftOvers.size / 2)
+        return result.sorted().elementAt(result.size / 2)
     }
 
     // test if implementation meets criteria from the description, like:
